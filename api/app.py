@@ -50,4 +50,27 @@ def getDataTable(table,columns, where, groupBy, having, orderBy):
     db.close()
     return rows
 
+def truncated(table):
+    # open connect Database
+    db = connectDb()
+
+    # use method cursor()
+    cursor = connectCursor(db)
+    sql="TRUNCATE TABLE %s"%table
+    try:
+        # Thuc thi lenh SQL
+        cursor.execute(sql)
+        #print rows
+        # Commit cac thay doi vao trong Database
+        db.commit()
+    except:
+        # Rollback trong tinh huong co bat ky error nao
+        db.rollback()
+        return False
+
+    # ngat ket noi voi server
+    db.close()
+    return True
+
+
 app = Flask(__name__)

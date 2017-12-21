@@ -2,10 +2,12 @@
 from api.app import app
 from api.caption import mod as caption
 from api.videos import mod as videos
+from api.category import mod as videocategories
 import os
 
 app.register_blueprint(caption, url_prefix='/caption')
 app.register_blueprint(videos, url_prefix='/videos')
+app.register_blueprint(videocategories, url_prefix='/videocategories')
 
 @app.route('/')
 def handle_defaule():
