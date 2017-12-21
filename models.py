@@ -1,5 +1,7 @@
-class Subtitle:
-    def __init__(self,videoId, num, start, end, text, lang):
+
+class Subtitle():
+    def __init__(self,id, videoId, num, start, end, text, lang):
+        self.id=id
         self.videoId= videoId
         self.num=num
         self.start=start
@@ -14,6 +16,8 @@ class Video:
         self.channelId = channelId
         self.title= title
         self.level= level
+
+
 
 
 

@@ -1,6 +1,6 @@
 import json
 import urllib2
-from flask import Flask, jsonify, abort, request, make_response, url_for
+from flask import Flask, jsonify, abort, request
 from flask import Blueprint
 
 # This sample executes a search request for the specified search term.
@@ -13,9 +13,7 @@ from flask import Blueprint
 import argparse
 
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from howtospeak_backend.models import *
-from howtospeak_backend.app import *
+from app import *
 
 
 # Set DEVELOPER_KEY to the API key value from the APIs & auth > Registered apps
@@ -52,7 +50,7 @@ def videos_list_by_id(videoId):
     part='snippet',
     id=videoId
   ).execute()
-  print "%s" % (response)
+  #print "%s" % (response)
   return response
 
 
@@ -73,7 +71,7 @@ def addVideo(video_id,categoryId,channelId,title,level):
            'Title': title,
            'Level': level,
            }
-    print sql
+    #print sql
     try:
         # Thuc thi lenh SQL
         cursor.execute(sql)

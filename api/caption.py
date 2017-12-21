@@ -1,18 +1,13 @@
-#!/usr/bin/python
 import urllib2
-import urlparse
-import codecs
-import re
 import json
 import xml.etree.ElementTree as ET
-from optparse import OptionParser
 from collections import namedtuple
 from flask import Blueprint
 from flask import request, abort
 from flask import jsonify
-from howtospeak_backend.app import *
-from howtospeak_backend.models import *
-from api.videos import videos_list_by_id,addVideo
+from app import *
+from models import Video
+from videos import videos_list_by_id,addVideo
 
 
 mod = Blueprint('caption',__name__)
@@ -26,7 +21,7 @@ def download():
     if not request.data:
         abort(400)
     jsoninput=json.loads(request.data)
-    print request.data
+    #print request.data
     data=jsoninput['data']
     str=""
     for r in data:
@@ -34,14 +29,63 @@ def download():
         level= r['level']
         if video_id:
                 if getSubtitle(video_id):
-                    print("[+]%s: Done"%video_id)
+                    #print("[+]%s: Done"%video_id)
                     response=videos_list_by_id(video_id)
                     snippet=response['items'][0]['snippet']
                     addVideo(video_id,snippet['categoryId'],snippet['channelId'],snippet['title'],level)
                 else:
-                    print("[+]%s: Video not found or doesn't have captions"%video_id)
+                    #print("[+]%s: Video not found or doesn't have captions"%video_id)
                     str=", "+video_id
     return jsonify(error=str)
+
+@mod.route('/subtitle', methods = ['GET'])
+def searchBySub():
+    text = request.args.get('text', default='*', type=str)
+    rows=getDataTable("subtitle","*","WHERE Text LIKE '%s %s %s' OR Text LIKE '%s%s' OR Text LIKE '%s%s'"%("%",text,"%","%",text,text,"%"),"GROUP BY VideoId","","")
+    data = []
+    for r in rows:
+        video=getVideoById(r[1])
+        data.append(
+            {
+            'video':{
+                'id': video.id,
+                'categoryId': video.categoryId,
+                'channelId' :video.channelId,
+                'title' : video.title,
+                'level' : video.level
+            },
+            'sub': {
+            'id': r[0],
+            'videiId': r[1],
+            'num': r[2],
+            'start': r[3],
+            'end': r[4],
+            'text': r[5]
+            }
+        })
+    return jsonify(listVideoSub=data)
+
+@mod.route('/video', methods = ['GET'])
+def searchSubByVideo():
+    text = request.args.get('videoId', default='*', type=str)
+    rows=getDataTable("subtitle","*","WHERE VideoId='%s'"%(text),"","","ORDER BY Num")
+    data = []
+    for r in rows:
+        data.append({
+            'id': r[0],
+            'videiId': r[1],
+            'num': r[2],
+            'start': r[3],
+            'end': r[4],
+            'text': r[5],
+        })
+    return jsonify(listSub=data)
+
+def getVideoById(video_id):
+    rows=getDataTable("video","*","WHERE Id='%s'"%(video_id),"","","")
+    for r in rows:
+        video=Video(r[0],r[1],r[2],r[3],r[4])
+    return video
 
 def getSubtitle(video_id):
     url = "http://video.google.com/timedtext?lang=en&v="+video_id
@@ -90,7 +134,6 @@ def convert_caption(caption,video_id):
                 end = caption[num].start  # we use the next start if available
             else:
                 end = start + 5  # last resort
-        subtitle=Subtitle(video_id,num,convert_time(start),convert_time(end),line.text,"en")
         # open connect Database
         db = connectDb()
 
