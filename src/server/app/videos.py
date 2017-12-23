@@ -1,5 +1,4 @@
 import json
-import urllib2
 from flask import jsonify, abort, request
 from flask import Blueprint
 
@@ -11,7 +10,7 @@ from flask import Blueprint
 #       to find the correct place to provide that key..
 
 from googleapiclient.discovery import build
-from db import *
+from .db import *
 
 
 # Set DEVELOPER_KEY to the API key value from the APIs & auth > Registered apps
@@ -31,12 +30,12 @@ def add():
         abort(400)
 
     jsoninput = json.loads(request.data)
-    print request.data
+    print(request.data)
 
     try:
         video_id = jsoninput["videoId"]
         videos_list_by_id(video_id)
-    except urllib2.HTTPError:
+    except Exception:
         return jsonify(success=False)
     return jsonify(success=True)
 
@@ -107,7 +106,7 @@ def addVideo(video_id, categoryId, channelId, title, level):
         # Commit cac thay doi vao trong Database
         db.commit()
     except Exception as e:
-        print e
+        print (e)
         # Rollback trong tinh huong co bat ky error nao
         db.rollback()
         return False

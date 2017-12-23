@@ -20,7 +20,7 @@ services:
     depends_on:
       - mysql
     links:
-      - mysql
+      - mysql:mysql
     volumes:
       - ./src/server:/server
     ports:

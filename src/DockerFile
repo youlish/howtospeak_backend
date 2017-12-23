@@ -1,9 +1,11 @@
-FROM python:3.5
+FROM python:3.6
 
 MAINTAINER Koen Rutten <lijst@twilights.be>
 
 # Install uWSGI
 RUN pip install uwsgi
+
+RUN apt-get update
 
 ENV NGINX_VERSION 1.9.11-1~jessie
 

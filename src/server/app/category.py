@@ -1,9 +1,9 @@
-import urllib2
+
 from flask import jsonify
 from flask import Blueprint
 
 from googleapiclient.discovery import build
-from db import *
+from .db import *
 
 DEVELOPER_KEY = 'AIzaSyDrv7dBHAMN0lXxwQy-5784khjCb9X4wBs'
 YOUTUBE_API_SERVICE_NAME = 'youtube'
@@ -21,7 +21,7 @@ def update():
             items = response['items']
             for r in items:
                 addCategory(r['id'], r['snippet']['title'])
-    except urllib2.HTTPError:
+    except Exception:
         return jsonify(success=False)
     return jsonify(success=True)
 
@@ -55,7 +55,7 @@ def addCategory(cid, title):
         cursor.execute(sql)
         db.commit()
     except Exception as e:
-        print e
+        print (e)
         db.rollback()
         return False
     finally:

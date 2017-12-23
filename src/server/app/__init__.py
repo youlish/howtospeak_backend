@@ -13,7 +13,7 @@ app.register_blueprint(video_categories, url_prefix='/videocategories')
 
 @app.route('/')
 def handle_default():
-    import urllib
+    from urllib.parse import urlparse
     output = []
     for rule in current_app.url_map.iter_rules():
 
@@ -23,9 +23,9 @@ def handle_default():
 
         methods = ','.join(rule.methods)
         url = url_for(rule.endpoint, **options)
-        line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        line = urlparse("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
         output.append(line)
 
     for line in sorted(output):
-        print line
+        print (line)
     return jsonify(urls=output)

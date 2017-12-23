@@ -3,7 +3,7 @@ import MySQLdb
 
 def connectDb():
     db = MySQLdb.connect(
-        host='127.0.0.1',
+        host='mysql',
         user='root',
         passwd='hinhct',
         db='howtospeak',
@@ -40,7 +40,7 @@ def getDataTable(table,columns, where, groupBy, having, orderBy):
         rows = cursor.fetchall()
         db.commit()
     except Exception as e:
-        print e
+        print(e)
         db.rollback()
     finally:
         db.close()
@@ -55,7 +55,7 @@ def truncated(table):
         cursor.execute(sql)
         db.commit()
     except Exception as e:
-        print e
+        print(e)
         db.rollback()
         return False
     finally:

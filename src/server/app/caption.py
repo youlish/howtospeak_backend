@@ -1,11 +1,11 @@
-import urllib2
+import urllib
 import json
 import xml.etree.ElementTree as ET
 from collections import namedtuple
 from flask import Blueprint
 from flask import request, abort
 from flask import jsonify
-from videos import videos_list_by_id, addVideo
+from .videos import videos_list_by_id, addVideo
 from .db import *
 
 
@@ -106,15 +106,13 @@ def getVideoById(video_id):
 def getSubtitle(video_id):
     url = "http://video.google.com/timedtext?lang=en&v="+video_id
     try:
-        caption=parse_track(urllib2.urlopen(url),video_id)
+        caption=parse_track(urllib.request.urlopen(url), video_id)
         if caption:
             print("hinh_ct")
             # save_srt(caption, video_id)
-            success = True
-    except urllib2.HTTPError:
+    except:
         return False
-
-    return success
+    return True
 
 
 def parse_track(track, video_id):

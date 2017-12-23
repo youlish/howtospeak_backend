@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `howtospeak` /*!40100 DEFAULT CHARACTER SET utf8 
 USE `howtospeak`;
 -- MySQL dump 10.13  Distrib 5.7.12, for linux-glibc2.5 (x86_64)
 --
--- Host: localhost    Database: howtospeak
+-- Host: 0.0.0.0    Database: howtospeak
 -- ------------------------------------------------------
 -- Server version	5.5.5-10.1.13-MariaDB
 
@@ -129,4 +129,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-12-23 19:32:09
+-- Dump completed on 2017-12-23 21:54:38
