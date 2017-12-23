@@ -106,4 +106,4 @@ ENV/
 #MySQL data folder
 mysql_data/
 
-.idea
+.idea/

@@ -11,6 +11,11 @@ app.register_blueprint(videos, url_prefix='/videos')
 app.register_blueprint(video_categories, url_prefix='/videocategories')
 
 
+@app.route('/ping')
+def ping():
+    return 'pong'
+
+
 @app.route('/')
 def handle_default():
     from urllib.parse import urlparse
