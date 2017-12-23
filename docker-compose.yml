@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+  mysql:
+    restart: always
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=hinhct
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  flask-wsgi:
+    restart: always
+    build:
+      context: ./src
+      dockerfile: DockerFile
+    image: src
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    volumes:
+      - ./src/server:/server
+    ports:
+      - "80:80"
+      - "443:443"

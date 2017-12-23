@@ -1,24 +1,25 @@
-from flask import Flask
 import MySQLdb
 
 
 def connectDb():
-    db = MySQLdb.connect(host='127.0.0.1'
-                         , user='root'
-                         , passwd=''
-                         , db='howtospeak'
-                         , charset='utf8'
-                         , use_unicode=True)
+    db = MySQLdb.connect(
+        host='127.0.0.1',
+        user='root',
+        passwd='hinhct',
+        db='howtospeak',
+        charset='utf8',
+        use_unicode=True)
     return db
-def connectCursor(db):
 
+
+def connectCursor(db):
     cursor = db.cursor()
     return cursor
+
 
 def getDataTable(table,columns, where, groupBy, having, orderBy):
     # open connect Database
     db = connectDb()
-
     # use method cursor()
     cursor = connectCursor(db)
     sql = """SELECT %(columns)s FROM %(table)s
@@ -33,44 +34,30 @@ def getDataTable(table,columns, where, groupBy, having, orderBy):
            'having': having,
            'orderBy': orderBy
            }
-    #print sql
-    # print sql
+    rows = []
     try:
-        # Thuc thi lenh SQL
         cursor.execute(sql)
         rows = cursor.fetchall()
-        #print rows
-        # Commit cac thay doi vao trong Database
         db.commit()
-    except:
-        # Rollback trong tinh huong co bat ky error nao
+    except Exception as e:
+        print e
         db.rollback()
-
-    # ngat ket noi voi server
-    db.close()
+    finally:
+        db.close()
     return rows
 
-def truncated(table):
-    # open connect Database
-    db = connectDb()
 
-    # use method cursor()
+def truncated(table):
+    db = connectDb()
     cursor = connectCursor(db)
-    sql="TRUNCATE TABLE %s"%table
+    sql = "TRUNCATE TABLE %s" % table
     try:
-        # Thuc thi lenh SQL
         cursor.execute(sql)
-        #print rows
-        # Commit cac thay doi vao trong Database
         db.commit()
-    except:
-        # Rollback trong tinh huong co bat ky error nao
+    except Exception as e:
+        print e
         db.rollback()
         return False
-
-    # ngat ket noi voi server
-    db.close()
+    finally:
+        db.close()
     return True
-
-
-app = Flask(__name__)

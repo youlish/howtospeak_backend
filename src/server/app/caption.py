@@ -5,75 +5,91 @@ from collections import namedtuple
 from flask import Blueprint
 from flask import request, abort
 from flask import jsonify
-from app import *
-from models import Video
-from videos import videos_list_by_id,addVideo
+from videos import videos_list_by_id, addVideo
+from .db import *
 
 
-mod = Blueprint('caption',__name__)
+mod = Blueprint('caption', __name__)
 TRACK_KEYS = 'id name lang_original lang_translated lang_default'
 
 Track = namedtuple('Track', TRACK_KEYS)
 Line = namedtuple('Line', 'start duration text')
 
-@mod.route('/download', methods = ['POST'])
+
+class VideoPresent(object):
+    def __init__(self, id, category_id, channel_id, title, level):
+        self.id = id
+        self.categoryId = category_id
+        self.channelId = channel_id
+        self.title = title
+        self.level = level
+
+
+@mod.route('/download', methods=['POST'])
 def download():
     if not request.data:
         abort(400)
-    jsoninput=json.loads(request.data)
-    #print request.data
-    data=jsoninput['data']
-    str=""
+    jsoninput = json.loads(request.data)
+    # print request.data
+    data = jsoninput['data']
+    string = ""
     for r in data:
         video_id = r['videoId']
         level= r['level']
         if video_id:
                 if getSubtitle(video_id):
-                    #print("[+]%s: Done"%video_id)
-                    response=videos_list_by_id(video_id)
-                    snippet=response['items'][0]['snippet']
-                    addVideo(video_id,snippet['categoryId'],snippet['channelId'],snippet['title'],level)
+                    # print("[+]%s: Done"%video_id)
+                    response = videos_list_by_id(video_id)
+                    snippet = response['items'][0]['snippet']
+                    addVideo(video_id, snippet['categoryId'],
+                             snippet['channelId'], snippet['title'], level)
                 else:
-                    #print("[+]%s: Video not found or doesn't have captions"%video_id)
-                    str=", "+video_id
-    return jsonify(error=str)
+                    # print("[+]%s: Video not found or doesn't have captions"%video_id)
+                    string = ", " + video_id
+    return jsonify(error=string)
 
-@mod.route('/subtitle', methods = ['GET'])
+
+@mod.route('/subtitle', methods=['GET'])
 def searchBySub():
     text = request.args.get('text', default='*', type=str)
-    rows=getDataTable("subtitle","*","WHERE Text LIKE '%s %s %s' OR Text LIKE '%s%s' OR Text LIKE '%s%s'"%("%",text,"%","%",text,text,"%"),"GROUP BY VideoId","","")
+    rows = getDataTable("subtitle", "*",
+                        "WHERE Text LIKE '%s %s %s' OR Text LIKE '%s%s' OR Text LIKE '%s%s'" % (
+                            "%", text, "%", "%", text, text, "%"),
+                        "GROUP BY VideoId", "", "")
     data = []
     for r in rows:
-        video=getVideoById(r[1])
+        video = getVideoById(r[1])
         data.append(
             {
-            'video':{
-                'id': video.id,
-                'categoryId': video.categoryId,
-                'channelId' :video.channelId,
-                'title' : video.title,
-                'level' : video.level
-            },
-            'sub': {
-            'id': r[0],
-            'videiId': r[1],
-            'num': r[2],
-            'start': r[3],
-            'end': r[4],
-            'text': r[5]
-            }
-        })
+                'video': {
+                    'id': video.id,
+                    'categoryId': video.categoryId,
+                    'channelId': video.channelId,
+                    'title': video.title,
+                    'level': video.level
+                },
+                'sub': {
+                    'id': r[0],
+                    'videoId': r[1],
+                    'num': r[2],
+                    'start': r[3],
+                    'end': r[4],
+                    'text': r[5]
+                }
+            })
     return jsonify(listVideoSub=data)
 
-@mod.route('/video', methods = ['GET'])
+
+@mod.route('/video', methods=['GET'])
 def searchSubByVideo():
     text = request.args.get('videoId', default='*', type=str)
-    rows=getDataTable("subtitle","*","WHERE VideoId='%s'"%(text),"","","ORDER BY Num")
+    rows = getDataTable("subtitle", "*", "WHERE VideoId='%s'" % text,
+                        "", "", "ORDER BY Num")
     data = []
     for r in rows:
         data.append({
             'id': r[0],
-            'videiId': r[1],
+            'videoId': r[1],
             'num': r[2],
             'start': r[3],
             'end': r[4],
@@ -81,11 +97,11 @@ def searchSubByVideo():
         })
     return jsonify(listSub=data)
 
+
 def getVideoById(video_id):
-    rows=getDataTable("video","*","WHERE Id='%s'"%(video_id),"","","")
-    for r in rows:
-        video=Video(r[0],r[1],r[2],r[3],r[4])
-    return video
+    rows = getDataTable("video", "*", "WHERE Id='%s'" % video_id, "", "", "")
+    return VideoPresent(*rows[0]) if rows else None
+
 
 def getSubtitle(video_id):
     url = "http://video.google.com/timedtext?lang=en&v="+video_id
@@ -93,12 +109,13 @@ def getSubtitle(video_id):
         caption=parse_track(urllib2.urlopen(url),video_id)
         if caption:
             print("hinh_ct")
-            #save_srt(caption, video_id)
+            # save_srt(caption, video_id)
             success = True
     except urllib2.HTTPError:
         return False
 
     return success
+
 
 def parse_track(track, video_id):
     """Parse a track returned by youtube and return a list of lines."""
@@ -114,13 +131,14 @@ def parse_track(track, video_id):
         text = element.text
         lines.append(Line(start, duration, text))
 
-    #print lines
-    sub=convert_caption(lines,video_id)
-    #print sub
+    # print lines
+    sub = convert_caption(lines,video_id)
+    # print sub
 
     return sub
 
-def convert_caption(caption,video_id):
+
+def convert_caption(caption, video_id):
     """Convert each line in a caption to srt format and return a list."""
     if not caption:
         return
@@ -137,13 +155,13 @@ def convert_caption(caption,video_id):
         # open connect Database
         db = connectDb()
 
-        #use method cursor()
+        # use method cursor()
         cursor = connectCursor(db)
 
-        #sql insert database
+        # sql insert database
         sql = """INSERT INTO subtitle(VideoId,
                  Num, Start, End, Text, Lang)
-                 VALUES ('%(VideoId)s', %(Num)s, '%(Start)s', '%(End)s', '%(Text)s', '%(Lang)s')"""% \
+                 VALUES ('%(VideoId)s', %(Num)s, '%(Start)s', '%(End)s', '%(Text)s', '%(Lang)s')""" % \
             {'VideoId': video_id,
              'Num': num,
              'Start': convert_time(start),
@@ -151,7 +169,7 @@ def convert_caption(caption,video_id):
              'Text': line.text,
              'Lang': "en"
              }
-        #print sql
+        # print sql
         try:
             # Thuc thi lenh SQL
             cursor.execute(sql)
@@ -174,6 +192,7 @@ def convert_caption(caption,video_id):
         lines.append(line)
 
     return lines
+
 
 def convert_time(time):
     """Convert given time to srt format."""
