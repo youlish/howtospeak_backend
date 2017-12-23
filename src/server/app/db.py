@@ -34,6 +34,7 @@ def getDataTable(table,columns, where, groupBy, having, orderBy):
            'having': having,
            'orderBy': orderBy
            }
+    print(sql)
     rows = []
     try:
         cursor.execute(sql)

@@ -52,10 +52,8 @@ def download():
 @mod.route('/subtitle', methods=['GET'])
 def searchBySub():
     text = request.args.get('text', default='*', type=str)
-    rows = getDataTable("subtitle", "*",
-                        "WHERE Text LIKE '%s %s %s' OR Text LIKE '%s%s' OR Text LIKE '%s%s'" % (
-                            "%", text, "%", "%", text, text, "%"),
-                        "GROUP BY VideoId", "", "")
+    inner_join = "inner join (SELECT  VideoId, Min(Num) AS Num FROM subtitle WHERE Text LIKE '% " + text + " %' OR Text LIKE '%" + text + "' OR Text LIKE '"+text+"%' group by VideoId) AS T on subtitle.VideoId=T.VideoId and subtitle.Num=T.Num"
+    rows = getDataTable("subtitle", "*", inner_join, "", "", "")
     data = []
     for r in rows:
         video = getVideoById(r[1])
