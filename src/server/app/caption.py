@@ -59,8 +59,7 @@ def searchBySub():
     data = []
     for r in rows:
         # video = getVideoById(r[1])
-        rowvs = getDataTable("video", "*", "WHERE Id='%s'" % r[1], "", "", "")
-        r2 = rowvs[0]
+        r2 = get_first_data_table("video", "*", "WHERE Id='%s'" % r[1], "", "", "")
         data.append(
             {
                 'video': {

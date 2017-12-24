@@ -48,6 +48,38 @@ def getDataTable(table,columns, where, groupBy, having, orderBy):
     return rows
 
 
+def get_first_data_table(table,columns, where, groupBy, having, orderBy):
+    # open connect Database
+    db = connectDb()
+    # use method cursor()
+    cursor = connectCursor(db)
+    sql = """SELECT %(columns)s FROM %(table)s
+                    %(where)s
+                    %(groupBy)s
+                    %(having)s
+                    %(orderBy)s""" % \
+          {'columns': columns,
+           'table': table,
+           'where': where,
+           'groupBy': groupBy,
+           'having': having,
+           'orderBy': orderBy
+           }
+    print(sql)
+    try:
+        cursor.execute(sql)
+        row = cursor.fetchone()
+        db.commit()
+    except Exception as e:
+        print(e)
+        db.rollback()
+        return None
+    finally:
+        db.close()
+    return row
+
+
+
 # DELETE FROM table_name WHERE condition;
 
 def delete(table, condition):
