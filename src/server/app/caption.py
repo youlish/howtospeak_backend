@@ -17,8 +17,8 @@ Line = namedtuple('Line', 'start duration text')
 
 
 class VideoPresent(object):
-    def __init__(self, id, category_id, channel_id, title, level):
-        self.id = id
+    def __init__(self, video_id, category_id, channel_id, title, level):
+        self.video_id = video_id
         self.categoryId = category_id
         self.channelId = channel_id
         self.title = title
@@ -54,6 +54,7 @@ def download():
 def searchBySub():
     text = request.args.get('text', default='*', type=str)
     inner_join = "inner join (SELECT  VideoId, Min(Num) AS Num FROM subtitle WHERE Text LIKE '% " + text + " %' OR Text LIKE '%" + text + "' OR Text LIKE '"+text+"%' group by VideoId) AS T on subtitle.VideoId=T.VideoId and subtitle.Num=T.Num"
+    print(inner_join)
     rows = getDataTable("subtitle", "*", inner_join, "", "", "")
     data = []
     for r in rows:
@@ -61,7 +62,7 @@ def searchBySub():
         data.append(
             {
                 'video': {
-                    'id': video.id,
+                    'id': video.video_id,
                     'categoryId': video.categoryId,
                     'channelId': video.channelId,
                     'title': video.title,
