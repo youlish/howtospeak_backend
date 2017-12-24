@@ -68,7 +68,7 @@ def searchBySub():
                         'num': r[2],
                         'start': r[3],
                         'end': r[4],
-                        'text': str(r[5]).replace("&#39;", "'")
+                        'text': html.unescape(r[5])
                     }
                 })
     return jsonify(listVideoSub=data)
@@ -87,7 +87,7 @@ def searchSubByVideo():
             'num': r[2],
             'start': r[3],
             'end': r[4],
-            'text': r[5]
+            'text': html.unescape(r[5])
         })
     return jsonify(listSub=data)
 
@@ -95,9 +95,8 @@ def searchSubByVideo():
 @mod.route('/delete-all', methods=['GET'])
 def delete_all():
     try:
-        truncated("subtitle")
+        truncated("video")
     except Exception as e:
-        print (e)
         return jsonify(success=False)
     return jsonify(success=True)
 
@@ -125,11 +124,10 @@ def parse_track(track, video_id):
         start = float(element.get('start'))
         # duration is sometimes unspecified
         duration = float(element.get('dur') or 0)
-        text = element.text
-        lines.append(Line(start, duration, text))
+        lines.append(Line(start, duration, element.text))
 
     # print lines
-    sub = convert_caption(lines,video_id)
+    sub = convert_caption(lines, video_id)
     # print sub
 
     return sub
@@ -163,7 +161,7 @@ def convert_caption(caption, video_id):
              'Num': num,
              'Start': convert_time(start),
              'End': convert_time(end),
-             'Text': html.unescape(line.text),
+             'Text': line.text,
              'Lang': "en"
              }
         # print sql
