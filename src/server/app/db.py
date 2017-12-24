@@ -69,7 +69,6 @@ def get_first_data_table(table,columns, where, groupBy, having, orderBy):
     try:
         cursor.execute(sql)
         row = cursor.fetchone()
-        print(row)
         db.commit()
     except Exception as e:
         print(e)
