@@ -54,6 +54,15 @@ def searchByCategoryId():
     return jsonify(listVideo=data)
 
 
+@mod.route('/delete-all', methods=['GET'])
+def delete_all():
+    try:
+        truncated("video")
+    except Exception as e:
+        return jsonify(success=False)
+    return jsonify(success=True)
+
+
 @mod.route('/level', methods=['GET'])
 def searchByLevel():
     text = request.args.get('level', default='*', type=str)

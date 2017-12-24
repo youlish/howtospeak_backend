@@ -17,7 +17,7 @@ def update():
     try:
         response = video_categories_list()
         if response:
-            truncated("c")
+            truncated("category")
             items = response['items']
             for r in items:
                 addCategory(r['id'], r['snippet']['title'])

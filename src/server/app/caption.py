@@ -1,5 +1,6 @@
 import urllib
 import json
+import html
 import xml.etree.ElementTree as ET
 from collections import namedtuple
 from flask import Blueprint
@@ -86,9 +87,19 @@ def searchSubByVideo():
             'num': r[2],
             'start': r[3],
             'end': r[4],
-            'text': str(r[5]).replace("&#39;", "'")
+            'text': r[5]
         })
     return jsonify(listSub=data)
+
+
+@mod.route('/delete-all', methods=['GET'])
+def delete_all():
+    try:
+        truncated("subtitle")
+    except Exception as e:
+        print (e)
+        return jsonify(success=False)
+    return jsonify(success=True)
 
 
 def getSubtitle(video_id):
@@ -152,7 +163,7 @@ def convert_caption(caption, video_id):
              'Num': num,
              'Start': convert_time(start),
              'End': convert_time(end),
-             'Text': line.text,
+             'Text': html.unescape(line.text),
              'Lang': "en"
              }
         # print sql
