@@ -58,15 +58,17 @@ def searchBySub():
     rows = getDataTable("subtitle", "*", inner_join, "", "", "")
     data = []
     for r in rows:
-        video = getVideoById(r[1])
+        # video = getVideoById(r[1])
+        rowvs = getDataTable("video", "*", "WHERE Id='%s'" % r[1], "", "", "")
+        r2 = rowvs[0]
         data.append(
             {
                 'video': {
-                    'id': video.videoId,
-                    'categoryId': video.categoryId,
-                    'channelId': video.channelId,
-                    'title': video.title,
-                    'level': video.level
+                    'id': r2[0],
+                    'categoryId':r2[1],
+                    'channelId': r2[2],
+                    'title': r2[3],
+                    'level': r2[4]
                 },
                 'sub': {
                     'id': r[0],
