@@ -16,15 +16,6 @@ Track = namedtuple('Track', TRACK_KEYS)
 Line = namedtuple('Line', 'start duration text')
 
 
-class VideoPresent(object):
-    def __init__(self, video_id, category_id, channel_id, title, level):
-        self.videoId = video_id
-        self.categoryId = category_id
-        self.channelId = channel_id
-        self.title = title
-        self.level = level
-
-
 @mod.route('/download', methods=['POST'])
 def download():
     if not request.data:
@@ -60,27 +51,25 @@ def searchBySub():
     for r in rows:
         # video = getVideoById(r[1])
         row = get_first_data_table("video", "*", "WHERE Id='%s'" % r[1], "", "", "")
-        print (row)
-        video_id = row[0]
-        print(video_id)
-        data.append(
-            {
-                'video': {
-                    'id': row[0],
-                    'categoryId': row[1],
-                    'channelId': row[2],
-                    'title': row[3],
-                    'level': row[4]
-                },
-                'sub': {
-                    'id': r[0],
-                    'videoId': r[1],
-                    'num': r[2],
-                    'start': r[3],
-                    'end': r[4],
-                    'text': r[5]
-                }
-            })
+        if row is not None:
+            data.append(
+                {
+                    'video': {
+                        'id': row[0],
+                        'categoryId': row[1],
+                        'channelId': row[2],
+                        'title': row[3],
+                        'level': row[4]
+                    },
+                    'sub': {
+                        'id': r[0],
+                        'videoId': r[1],
+                        'num': r[2],
+                        'start': r[3],
+                        'end': r[4],
+                        'text': r[5]
+                    }
+                })
     return jsonify(listVideoSub=data)
 
 
@@ -100,11 +89,6 @@ def searchSubByVideo():
             'text': r[5],
         })
     return jsonify(listSub=data)
-
-
-def getVideoById(video_id):
-    rows = getDataTable("video", "*", "WHERE Id='%s'" % video_id, "", "", "")
-    return VideoPresent(*rows[0]) if rows else None
 
 
 def getSubtitle(video_id):
