@@ -48,6 +48,25 @@ def getDataTable(table,columns, where, groupBy, having, orderBy):
     return rows
 
 
+# DELETE FROM table_name WHERE condition;
+
+def delete(table, condition):
+    db = connectDb()
+    cursor = connectCursor(db)
+    sql = "DELETE FROM %s WHERE %s" % (table, condition)
+    print (sql)
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except Exception as e:
+        print(e)
+        db.rollback()
+        return False
+    finally:
+        db.close()
+    return True
+
+
 def truncated(table):
     db = connectDb()
     cursor = connectCursor(db)

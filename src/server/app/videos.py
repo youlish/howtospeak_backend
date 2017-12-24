@@ -68,6 +68,18 @@ def searchByLevel():
     return jsonify(listVideo=data)
 
 
+@mod.route('/delete', methods=['GET'])
+def delete_video():
+    text = request.args.get('videoId', default='*', type=str)
+    try:
+        delete("video", "Id = '%s'" % text)
+        delete("subtitle", "VideoId = '%s'" % text)
+    except Exception as e:
+        print (e)
+        return jsonify(success=False)
+    return jsonify(success=True)
+
+
 def videos_list_by_id(videoId):
 
     # See full sample for function
