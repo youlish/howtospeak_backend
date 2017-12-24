@@ -27,8 +27,8 @@ def download():
     for r in data:
         video_id = r['videoId']
         level = r['level']
-        rows = getDataTable("video", "*", "WHERE VideoId=%s" % video_id, "", "", "ORDER BY Id")
-        if len(rows) > 0:
+        row = get_first_data_table("video", "*", "WHERE VideoId=%s" % video_id, "", "", "ORDER BY Id")
+        if row is None:
                 if getSubtitle(video_id):
                     # print("[+]%s: Done"%video_id)
                     response = videos_list_by_id(video_id)
