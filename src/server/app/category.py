@@ -21,9 +21,21 @@ def update():
             items = response['items']
             for r in items:
                 addCategory(r['id'], r['snippet']['title'])
-    except Exception:
+    except Exception as e:
         return jsonify(success=False)
     return jsonify(success=True)
+
+@mod.route('/', methods=['GET'])
+def get_list_category():
+    try:
+        rows = getDataTable("category", "*", "", "", "", "ORDER BY Id")
+        data = [{
+                    'id': r[0],
+                    'categoryName': r[1]
+                } for r in rows]
+    except Exception as e:
+        return jsonify(listVideo=[])
+    return jsonify(listVideo=data)
 
 
 def video_categories_list():

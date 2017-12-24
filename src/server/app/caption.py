@@ -67,7 +67,7 @@ def searchBySub():
                         'num': r[2],
                         'start': r[3],
                         'end': r[4],
-                        'text': r[5]
+                        'text': str(r[5]).replace("&#39;", "'")
                     }
                 })
     return jsonify(listVideoSub=data)
@@ -86,7 +86,7 @@ def searchSubByVideo():
             'num': r[2],
             'start': r[3],
             'end': r[4],
-            'text': r[5],
+            'text': str(r[5]).replace("&#39;", "'")
         })
     return jsonify(listSub=data)
 
