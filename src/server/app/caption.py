@@ -95,7 +95,7 @@ def searchSubByVideo():
 @mod.route('/delete-all', methods=['GET'])
 def delete_all():
     try:
-        truncated("video")
+        truncated("subtitle")
     except Exception as e:
         return jsonify(success=False)
     return jsonify(success=True)
@@ -104,7 +104,7 @@ def delete_all():
 def getSubtitle(video_id):
     url = "http://video.google.com/timedtext?lang=en&v="+video_id
     try:
-        caption=parse_track(urllib.request.urlopen(url), video_id)
+        caption = parse_track(urllib.request.urlopen(url), video_id)
         if caption:
             print("hinh_ct")
             # save_srt(caption, video_id)
@@ -124,7 +124,8 @@ def parse_track(track, video_id):
         start = float(element.get('start'))
         # duration is sometimes unspecified
         duration = float(element.get('dur') or 0)
-        lines.append(Line(start, duration, element.text))
+        text = element.text
+        lines.append(Line(start, duration, text))
 
     # print lines
     sub = convert_caption(lines, video_id)
