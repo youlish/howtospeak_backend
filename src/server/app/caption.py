@@ -18,7 +18,7 @@ Line = namedtuple('Line', 'start duration text')
 
 class VideoPresent(object):
     def __init__(self, video_id, category_id, channel_id, title, level):
-        self.video_id = video_id
+        self.videoId = video_id
         self.categoryId = category_id
         self.channelId = channel_id
         self.title = title
@@ -62,7 +62,7 @@ def searchBySub():
         data.append(
             {
                 'video': {
-                    'id': video.video_id,
+                    'id': video.videoId,
                     'categoryId': video.categoryId,
                     'channelId': video.channelId,
                     'title': video.title,
